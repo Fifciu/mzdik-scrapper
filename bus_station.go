@@ -8,13 +8,26 @@ import (
 	"strconv"
 )
 
-type BusStation struct {
+/*type BusStation struct {
 	name string
 	averageDelay int64
+}*/
+
+type BusStation struct {
+	Name string
+	AverageDelay string
 }
 
 func getBusStations(busNumber string) ([]BusStation, []BusStation){
-	url := fmt.Sprintf("http://www.mzdik.radom.pl/rozklady/000%s/w.htm", busNumber);
+	converted, err := strconv.ParseInt(busNumber, 10, 64);
+	if err != nil {
+		log.Fatal(err)
+	}
+	if converted < 10{
+		busNumber = "0" + busNumber;
+	}
+
+	url := fmt.Sprintf("http://www.mzdik.radom.pl/rozklady/00%s/w.htm", busNumber);
 	response, err := http.Get(url);
 	if err != nil {
 		log.Fatal(err)
@@ -31,19 +44,21 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 	
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a").Each(func(index int, element *goquery.Selection){
 		firstWayStations = append(firstWayStations, BusStation{ 
-			name: element.Text(),
-			averageDelay: 0,
+			Name: element.Text(),
+			AverageDelay: "0",
 		});
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > b").Each(func(index int, element *goquery.Selection){
 		firstWayStations = append(firstWayStations, BusStation{ 
-			name: element.Text(),
-			averageDelay: 0,
+			Name: element.Text(),
+			AverageDelay: "0",
 		});
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > b").Each(func(index int, element *goquery.Selection){
 		substr := element.Text()[0:2];
-		firstWayStations[index].averageDelay, err = strconv.ParseInt(substr, 10, 8);
+		tmp, err := strconv.ParseInt(substr, 10, 8);
+		tmp2 := int(tmp);
+		firstWayStations[index].AverageDelay = strconv.Itoa(tmp2);
 		if err != nil {
 			log.Fatal("Couldn't parse average delay!")
 		}
@@ -51,21 +66,23 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 
 	// Bus stations' names in opposite way
 	var oppoWayStations []BusStation;
-	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a").Each(func(index int, element *goquery.Selection){
+	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(3) > a").Each(func(index int, element *goquery.Selection){
 		oppoWayStations = append(oppoWayStations, BusStation{ 
-			name: element.Text(),
-			averageDelay: 0,
+			Name: element.Text(),
+			AverageDelay: "0",
 		});
 	})
-	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > b").Each(func(index int, element *goquery.Selection){
+	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(3) > b").Each(func(index int, element *goquery.Selection){
 		oppoWayStations = append(oppoWayStations, BusStation{ 
-			name: element.Text(),
-			averageDelay: 0,
+			Name: element.Text(),
+			AverageDelay: "0",
 		});
 	})
-	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > b").Each(func(index int, element *goquery.Selection){
+	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > b").Each(func(index int, element *goquery.Selection){
 		substr := element.Text()[0:2];
-		oppoWayStations[index].averageDelay, err = strconv.ParseInt(substr, 10, 8);
+		tmp, err := strconv.ParseInt(substr, 10, 8);
+		tmp2 := int(tmp);
+		oppoWayStations[index].AverageDelay = strconv.Itoa(tmp2);
 		if err != nil {
 			log.Fatal("Couldn't parse average delay!")
 		}
