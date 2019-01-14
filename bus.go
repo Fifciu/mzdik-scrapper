@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	//iconv "github.com/djimenez/iconv-go"
 )
 
 /*type BusStation struct {
@@ -45,12 +46,25 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 	}
 
 	url := fmt.Sprintf("http://www.mzdik.radom.pl/rozklady/00%s/w.htm", busNumber);
+	/*request, err := http.NewRequest("GET", url, nil);
+	if err != nil {
+		log.Fatal(err)
+	}*/
 	response, err := http.Get(url);
 	if err != nil {
 		log.Fatal(err)
 	}
+	/*request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
+	response, err := client.Do(request);
+	if err != nil {
+		log.Fatal(err)
+	}*/
 
 	defer response.Body.Close();
+	/*utfBody, err := iconv.NewReader(response.Body, "iso-8859-2", "utf-8")
+      if err != nil {
+        log.Fatal(err)
+      }*/
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		log.Fatal("Błąd goquery 1", err)
@@ -88,17 +102,20 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 			Name: element.Text(),
 			AverageDelay: "0",
 		});
+		//fmt.Println("id1: ", element.Text())
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(3) > b").Each(func(index int, element *goquery.Selection){
 		oppoWayStations = append(oppoWayStations, BusStation{ 
 			Name: element.Text(),
 			AverageDelay: "0",
 		});
+		///fmt.Println("id2: ", index)
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > b").Each(func(index int, element *goquery.Selection){
 		substr := element.Text()[0:2];
 		tmp, err := strconv.ParseInt(substr, 10, 8);
 		tmp2 := int(tmp);
+		//fmt.Println("id: ", index)
 		oppoWayStations[index].AverageDelay = strconv.Itoa(tmp2);
 		if err != nil {
 			log.Fatal("Couldn't parse average delay!")
