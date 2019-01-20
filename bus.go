@@ -7,7 +7,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	//iconv "github.com/djimenez/iconv-go"
+	charset "golang.org/x/net/html/charset"
+	htmlindex "golang.org/x/text/encoding/htmlindex"
+	html "golang.org/x/net/html"
+	"io"
+	"bufio"
 )
 
 /*type BusStation struct {
@@ -36,6 +40,36 @@ type BusCourseLetter struct {
 	Description string
 }
 
+func detectContentCharset(body io.Reader) string {
+    r := bufio.NewReader(body)
+    if data, err := r.Peek(1024); err == nil {
+        if _, name, ok := charset.DetermineEncoding(data, ""); ok {
+            return name
+        }
+    }
+    return "utf-8"
+}
+
+func Decode(body io.Reader, charset string) (*html.Node, error) {
+    if charset == "" {
+        charset = detectContentCharset(body)
+	}
+    e, err := htmlindex.Get(charset)
+    if err != nil {
+        return nil, err
+    }
+
+    if name, _ := htmlindex.Name(e); name != "utf-8" {
+        body = e.NewDecoder().Reader(body)
+    }
+
+    node, err := html.Parse(body);
+    if err != nil {
+        return nil, err
+    }
+    return node, nil
+}
+
 func getBusStations(busNumber string) ([]BusStation, []BusStation){
 	converted, err := strconv.ParseInt(busNumber, 10, 64);
 	if err != nil {
@@ -46,26 +80,17 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 	}
 
 	url := fmt.Sprintf("http://www.mzdik.radom.pl/rozklady/00%s/w.htm", busNumber);
-	/*request, err := http.NewRequest("GET", url, nil);
-	if err != nil {
-		log.Fatal(err)
-	}*/
+	
 	response, err := http.Get(url);
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
-	response, err := client.Do(request);
-	if err != nil {
-		log.Fatal(err)
-	}*/
 
 	defer response.Body.Close();
-	/*utfBody, err := iconv.NewReader(response.Body, "iso-8859-2", "utf-8")
-      if err != nil {
-        log.Fatal(err)
-      }*/
-	document, err := goquery.NewDocumentFromReader(response.Body)
+
+	decoded, err := Decode(response.Body, "iso-8859-2");
+	
+	document := goquery.NewDocumentFromNode(decoded);
 	if err != nil {
 		log.Fatal("Błąd goquery 1", err)
 	}
@@ -102,20 +127,20 @@ func getBusStations(busNumber string) ([]BusStation, []BusStation){
 			Name: element.Text(),
 			AverageDelay: "0",
 		});
-		//fmt.Println("id1: ", element.Text())
+		
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(3) > b").Each(func(index int, element *goquery.Selection){
 		oppoWayStations = append(oppoWayStations, BusStation{ 
 			Name: element.Text(),
 			AverageDelay: "0",
 		});
-		///fmt.Println("id2: ", index)
+	
 	})
 	document.Find("body > font > table:nth-child(2) > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > b").Each(func(index int, element *goquery.Selection){
 		substr := element.Text()[0:2];
 		tmp, err := strconv.ParseInt(substr, 10, 8);
 		tmp2 := int(tmp);
-		//fmt.Println("id: ", index)
+		
 		oppoWayStations[index].AverageDelay = strconv.Itoa(tmp2);
 		if err != nil {
 			log.Fatal("Couldn't parse average delay!")
