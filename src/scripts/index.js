@@ -4,6 +4,7 @@ import {Router} from './router';
 
 import routeHome from './views/home.js';
 import routeBus from './views/bus.js';
+import routeSchedule from './views/schedule.js';
 
 var router;
 
@@ -11,7 +12,7 @@ var router;
   router = new Router([
     { path: '/', renderFn: routeHome },
     { path: '/:busNumber', renderFn: routeBus },
-    { path: '/:busNumber/:way', renderFn: ()=>{} },
+    { path: '/:busNumber/:way/:station/:delay', renderFn: routeSchedule },
   ]);
 })();
 

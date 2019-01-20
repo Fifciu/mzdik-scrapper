@@ -1,4 +1,5 @@
-$body-color: blue;
+$blue: #2117f8;
+$darkBlue: #000096;
 
 * {
   box-sizing: border-box;
@@ -12,16 +13,16 @@ html, body{
 
 .container{
   padding: 2% 8%;
-}
 
-body {
-
+  &.nopadding{
+    padding: 0;
+  }
 }
 
 #numbers > .number {
   width: 60px;
   height: 60px;
-  border: 2px solid blue;
+  border: 2px solid $blue;
   text-align: center;
   line-height: 60px;
   font-size: 1.4em;
@@ -34,7 +35,7 @@ body {
   transition: .5s;
 
   &:hover{
-    background: #00f;
+    background: $blue;
     color: #fff;
   }
 }
@@ -42,7 +43,7 @@ body {
 .navbar{
   height: 56px;
   width:100%;
-  background: #0000ff;
+  background: $blue;
   position:fixed;
   left:0;
   top:0;
@@ -72,16 +73,39 @@ ul,li {
   list-style: none;
 }
 
-.container.bus-list {
-  margin-top: 45px;
+#app.bus-list {
+  margin-top: 65px;
+  padding: 0 10px;
+}
 
+#app.home{
+  margin-top: 46px;
+}
+
+#app {
   .navbar > strong {
     margin-right:5px;
+  }
+
+  transition: opacity 1s;
+
+  .navbar {
+    i{
+      transition:.7s;
+    }
+    i.hidden{
+      opacity:0;
+      transform:translateX(-100%);
+    }
+  }
+
+  &.mzd-transition-out{
+    opacity: 0;
   }
 }
 
 .direction__header{
-  color: #000096;
+  color: $darkBlue;
 }
 
 .directions{
@@ -130,8 +154,63 @@ ul,li {
         font-size: 1.2em;
       }
       padding: 10px 0px;
-      border-bottom: 1px dashed rgba(0,0,255,.3);
+      border-bottom: 1px dashed $darkBlue;
 
+    }
+  }
+}
+
+#app{
+  &.container-padding{
+    padding: 2% 8%;
+  }
+
+  @media (min-width:768px){
+    &.bus-list{
+      padding: 1% 4%;
+    }
+  }
+}
+
+#app.cont-schedule{
+  padding: 0;
+  padding-top: 56px;
+}
+.schedule{
+  .daytype{
+    h3{
+      margin:0;
+      padding: 10px 20px;
+      background: rgba(0,0,255,.65);
+      color:#fff;
+    }
+  }
+
+  .days {
+    overflow: hidden;
+    background: rgba(0,0,255,.1);
+    padding: 6%;
+      > .day {
+      float: left;
+      margin-right: 12px;
+      margin-bottom: 12px;
+      color: #555;
+
+      &.past{
+        color: #aaa;
+      }
+
+      &:last-of-type{
+        clear:right;
+      }
+    }
+  }
+}
+
+@media (min-width:800px){
+  .schedule{
+    .days{
+      padding: 20px;
     }
   }
 }

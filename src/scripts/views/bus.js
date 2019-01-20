@@ -1,33 +1,20 @@
 import {API} from '../globals';
 import {stationsInteraction} from './../interactions';
-import {renderBusNumber, renderDiv, renderHeader, coreNode} from '../dom';
+import {
+  renderBusNumber, renderDiv, renderHeader, coreNode,
+  addNavbarIfNotExists,
+} from '../dom';
+import cmpNavbar from './components/navbar';
 
 export default (keys) => {
   fetch(`${API}/buses/${keys.busNumber}/stations`)
   .then(response => response.json())
   .then(stations => {
     const core = coreNode();
-    core.classList.toggle('bus-list'); // REMEMBER TO DELETE
-
+    core.classList.add('bus-list'); // REMEMBER TO DELETE
+    core.className = 'bus-list';
     // Navbar
-    const nav = document.createElement('nav');
-    nav.classList.add('navbar');
-
-    const icon = document.createElement('i');
-    icon.id = 'backIcon';
-    icon.classList.add('fas');
-    icon.classList.add('fa-chevron-circle-left');
-    nav.appendChild(icon);
-
-    const header = document.createElement('strong');
-    header.textContent = 'MzdikPWA';
-    nav.appendChild(header);
-
-    const span = document.createElement('span');
-    span.textContent = `Linia nr ${keys.busNumber}`;
-    nav.appendChild(span);
-
-    core.appendChild(nav);
+    addNavbarIfNotExists(`Linia nr ${keys.busNumber}`, '/', 'MzdikPWA');
 
     // Header - Kierunek
     const h2 = renderHeader(2, 'Kierunek');

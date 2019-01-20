@@ -43,7 +43,13 @@ export const stationsInteraction = () => {
 
   [...document.querySelectorAll('.directions > .direction > li')].forEach(el => {
     el.addEventListener('click', ev => {
-      alert(`${el.textContent} / ${el.dataset.num} / ${el.parentElement.dataset.direction}`);
+      const direction = el.parentElement.dataset.direction;
+      const splittedUrl = window.location.pathname.split('/');
+      const delay = el.dataset.delay;
+
+     // document.querySelector('div#app').classList.remove('bus-list');
+
+      routerObj.move(`${window.location.pathname}/${direction}/${el.dataset.num}/${delay}`, { }, `MzdikPWA - Linia nr ${splittedUrl[1]}`);
     });
   });
 };

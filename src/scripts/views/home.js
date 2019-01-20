@@ -1,5 +1,5 @@
 import {API} from '../globals';
-import {renderBusNumber, renderDiv, renderHeader, coreNode} from '../dom';
+import {renderBusNumber, renderDiv, renderHeader, coreNode, addNavbarIfNotExists} from '../dom';
 
 export default () => {
   fetch(`${API}/buses`)
@@ -10,6 +10,11 @@ export default () => {
 
     const header = renderHeader(1, 'Wybierz numer linii');
     const core = coreNode();
+
+    core.className = 'home container-padding';
+
+    // Navbar
+    addNavbarIfNotExists(``);
 
     core.appendChild(header);
     core.appendChild(parent);

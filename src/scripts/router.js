@@ -1,5 +1,5 @@
 import routeHome from './views/home';
-import { clearCoreNode } from './dom';
+import { clearCoreNode, transitionIn } from './dom';
 
 export const Router = function(routes){
   this.currentArgs = {};
@@ -37,9 +37,40 @@ export const Router = function(routes){
     return -1;
   };
 
-  const launchView = (viewIndex) => {
-    clearCoreNode();
+  const privateMove = (path, state, title) => {
+    let routeIndex = findByPath(`${path}`);
+
+    if(routeIndex === -1){
+      window.location.href = '/';
+    } else {
+      launchView(routeIndex);
+      window.history.pushState(state, title, path);
+      document.title = title;
+
+      const arrow = document.querySelector('i#backIcon');
+
+      arrow.onclick = () => {
+        const path = window.location.pathname.split('/');
+
+        let newPath = '/';
+        switch(routeIndex){
+          case 2:
+            newPath = `/${path[1]}`;
+            break;
+          case 1:
+            newPath = '/';
+            break;
+        }
+
+        privateMove(newPath, {}, 'MzdikPWA');
+      };
+    }
+  };
+
+  const launchView = async (viewIndex) => {
+    await clearCoreNode();
     routes[viewIndex].renderFn(this.currentArgs);
+    setTimeout(transitionIn, 1000);
   };
 
   const path = window.location.pathname;
@@ -58,17 +89,8 @@ export const Router = function(routes){
 
   return {
     move: (path, state, title) => {
-      let routeIndex = findByPath(`${path}`);
-
-      if(routeIndex === -1){
-        window.location.href = '/';
-      } else {
-        launchView(routeIndex);
-        window.history.pushState(state, title, path);
-        document.title = title;
-      }
+      privateMove(path, state, title);
     },
-
     params: () => this.currentArgs
   };
 };
