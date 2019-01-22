@@ -25,8 +25,6 @@ export default (keys) => {
 
     addNavbarIfNotExists(`Linia nr ${keys.busNumber}`, oldPath, 'MzdikPWA');
 
-    //console.log(dayTypes[target]);
-
     const schedule = renderDiv();
     schedule.classList.add('schedule');
 
@@ -43,8 +41,6 @@ export default (keys) => {
 
       return dayname;
     };
-
-
 
     const properDaytype = cmpDaytype(getDayname(target), dayTypes[target], keys.delay);
     schedule.appendChild(properDaytype);

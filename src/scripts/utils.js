@@ -15,13 +15,23 @@ const compareHours = (a, b) => {
   }
 };
 
-const offsetToHour = (hour, offset) => {
+export const offsetToHour = (hour, offset) => {
   const time = hour.split('.').map(Number);
+  offset = Number(offset);
 
   time[1] += offset;
-  if(time >= 60){
+  if(time[1] >= 60){
     time[1] %= 60;
     time[0]++;
+    if(time[0] > 23){
+      time[0] = 0;
+    }
+  }
+
+  for(let i = 0; i < 2; i++){
+    if(time[i] < 10){
+      time[i] = `0${time[i]}`;
+    }
   }
 
   return time.join('.');

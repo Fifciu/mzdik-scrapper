@@ -1,5 +1,5 @@
 import { renderDiv, renderHeader } from './../../dom';
-import { compareWithOffset } from './../../utils';
+import { compareWithOffset, offsetToHour } from './../../utils';
 
 export default (dayName, hours, offset) => {
   const div = renderDiv();
@@ -15,14 +15,16 @@ export default (dayName, hours, offset) => {
   hours.forEach(hour => {
     const li = document.createElement('li');
     li.classList.add('day');
-    li.textContent = hour.Time;
+    li.textContent = offsetToHour(hour.Time, offset);
 
     // Add offset!
     const date = new Date();
     const currentHour = `${date.getHours()}.${date.getMinutes()}`;
     if(compareWithOffset(hour.Time, currentHour, offset) === 1){
       li.classList.add('past');
-    };
+    } else {
+
+    }
 
     ul.appendChild(li);
   });
